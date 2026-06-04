@@ -14,13 +14,13 @@
     }
   },
   "background": {
-    "service_worker": "background/service-worker.ts",
+    "service_worker": "background/service-worker.js",
     "type": "module"
   },
   "content_scripts": [
     {
       "matches": ["https://www.bilibili.com/*"],
-      "js": ["content/content-script.ts"]
+      "js": ["content/content-script.js"]
     }
   ],
   "options_page": "options.html"
