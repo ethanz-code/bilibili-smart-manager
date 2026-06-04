@@ -85,9 +85,61 @@ export class AIClassifier {
 
   /** AI增强分类（调用LLM API） */
   private async aiClassify(text: string): Promise<ClassificationResult> {
-    // 实际实现中会调用 OpenAI API
-    // 这里返回模拟结果
-    return { category: '其他', confidence: 0.5, tags: [] };
+    if (!this.apiKey) {
+      return { category: '其他', confidence: 0.5, tags: [] };
+    }
+
+    const prompt = `你是一个B站视频分类助手。请将以下视频信息分类到最合适的一个类别中。
+
+可选类别：${this.categories.join('、')}
+
+视频信息：
+${text}
+
+请严格按以下JSON格式返回，不要包含其他内容：
+{"category": "类别名", "confidence": 0.0到1之间的数字, "tags": ["相关标签"]}`;
+
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.1,
+          max_tokens: 200,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API请求失败: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content?.trim();
+
+      if (!content) {
+        throw new Error('API返回内容为空');
+      }
+
+      const result = JSON.parse(content);
+
+      if (!this.categories.includes(result.category)) {
+        result.category = '其他';
+      }
+
+      return {
+        category: result.category || '其他',
+        confidence: Math.min(Math.max(result.confidence || 0.5, 0), 1),
+        tags: Array.isArray(result.tags) ? result.tags.slice(0, 5) : [],
+      };
+    } catch (error) {
+      console.error('AI分类失败，回退到规则分类:', error);
+      return { category: '其他', confidence: 0.5, tags: [] };
+    }
   }
 
   /** 分类单个视频 */
@@ -111,7 +163,76 @@ export class AIClassifier {
 
   /** 批量分类视频 */
   async classifyVideos(videos: VideoInput[]): Promise<ClassificationResult[]> {
-    return Promise.all(videos.map(v => this.classifyVideo(v)));
+    if (!this.apiKey || videos.length === 0) {
+      return Promise.all(videos.map(v => this.classifyVideo(v)));
+    }
+
+    const batchSize = 10;
+    const results: ClassificationResult[] = [];
+
+    for (let i = 0; i < videos.length; i += batchSize) {
+      const batch = videos.slice(i, i + batchSize);
+      const batchResults = await this.batchAIClassify(batch);
+      results.push(...batchResults);
+    }
+
+    return results;
+  }
+
+  /** 批量AI分类（单次API调用） */
+  private async batchAIClassify(videos: VideoInput[]): Promise<ClassificationResult[]> {
+    const videoList = videos.map((v, i) =>
+      `${i + 1}. 标题: ${v.title} | 标签: ${(v.tags || []).join(',')} | 分区: ${v.tname || '未知'}`
+    ).join('\n');
+
+    const prompt = `你是B站视频分类助手。请将以下视频分别分类到最合适的一个类别中。
+
+可选类别：${this.categories.join('、')}
+
+视频列表：
+${videoList}
+
+请严格按以下JSON数组格式返回，每个元素对应一个视频：
+[{"category": "类别名", "confidence": 0.0到1之间的数字, "tags": ["相关标签"]}]`;
+
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.1,
+          max_tokens: 1000,
+        }),
+      });
+
+      if (!response.ok) throw new Error(`API请求失败: ${response.status}`);
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content?.trim();
+      if (!content) throw new Error('API返回内容为空');
+
+      const parsed = JSON.parse(content) as ClassificationResult[];
+
+      return parsed.map((r, i) => {
+        if (!this.categories.includes(r.category)) {
+          const ruleResult = this.ruleBasedClassify(videos[i].title, videos[i].tags, videos[i].tname);
+          return ruleResult || { category: '其他', confidence: 0.5, tags: [] };
+        }
+        return {
+          category: r.category,
+          confidence: Math.min(Math.max(r.confidence || 0.5, 0), 1),
+          tags: Array.isArray(r.tags) ? r.tags.slice(0, 5) : [],
+        };
+      });
+    } catch (error) {
+      console.error('批量AI分类失败，回退到规则分类:', error);
+      return Promise.all(videos.map(v => this.classifyVideo(v)));
+    }
   }
 
   /** 分类UP主 */

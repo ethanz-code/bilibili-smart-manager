@@ -1,16 +1,18 @@
 import React, { useState, useMemo } from 'react';
-import { BiliVideo } from '../types';
+import { BiliVideo, BiliFolder } from '../types';
 
 interface BookmarkManagerProps {
   videos: BiliVideo[];
+  folders: BiliFolder[];
   onAction: (action: string, videoIds: string[], target?: string) => void;
 }
 
-export const BookmarkManager: React.FC<BookmarkManagerProps> = ({ videos, onAction }) => {
+export const BookmarkManager: React.FC<BookmarkManagerProps> = ({ videos, folders, onAction }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedVideos, setSelectedVideos] = useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = useState<'date' | 'views' | 'title'>('date');
+  const [moveTarget, setMoveTarget] = useState<string>('');
 
   const categories = useMemo(() => {
     const cats = new Set(videos.map(v => v.tname || '其他'));
@@ -67,7 +69,11 @@ export const BookmarkManager: React.FC<BookmarkManagerProps> = ({ videos, onActi
 
   const handleBatchAction = (action: string) => {
     if (selectedVideos.size === 0) return;
-    onAction(action, Array.from(selectedVideos), selectedCategory || undefined);
+    if (action === 'move' && moveTarget) {
+      onAction(action, Array.from(selectedVideos), moveTarget);
+    } else {
+      onAction(action, Array.from(selectedVideos));
+    }
     setSelectedVideos(new Set());
   };
 
@@ -130,13 +136,27 @@ export const BookmarkManager: React.FC<BookmarkManagerProps> = ({ videos, onActi
         >
           批量删除
         </button>
-        <button
-          className="btn btn-primary"
-          disabled={selectedVideos.size === 0}
-          onClick={() => handleBatchAction('move')}
-        >
-          批量移动
-        </button>
+        {folders.length > 0 && (
+          <div className="move-group">
+            <select
+              value={moveTarget}
+              onChange={(e) => setMoveTarget(e.target.value)}
+              className="folder-select"
+            >
+              <option value="">选择目标收藏夹</option>
+              {folders.map(f => (
+                <option key={f.id} value={f.title}>{f.title} ({f.count})</option>
+              ))}
+            </select>
+            <button
+              className="btn btn-primary"
+              disabled={selectedVideos.size === 0 || !moveTarget}
+              onClick={() => handleBatchAction('move')}
+            >
+              批量移动
+            </button>
+          </div>
+        )}
         <button
           className="btn btn-secondary"
           disabled={selectedVideos.size === 0}

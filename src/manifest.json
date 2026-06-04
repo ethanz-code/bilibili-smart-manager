@@ -3,10 +3,10 @@
   "name": "B站智能管家",
   "version": "1.0.0",
   "description": "智能整理B站收藏夹和关注列表，支持AI分类和批量操作",
-  "permissions": ["storage", "activeTab", "tabs"],
+  "permissions": ["storage", "activeTab", "tabs", "alarms"],
   "host_permissions": ["https://api.bilibili.com/*"],
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "src/popup/popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
@@ -14,14 +14,14 @@
     }
   },
   "background": {
-    "service_worker": "background/service-worker.js",
+    "service_worker": "src/background/service-worker.ts",
     "type": "module"
   },
   "content_scripts": [
     {
       "matches": ["https://www.bilibili.com/*"],
-      "js": ["content/content-script.js"]
+      "js": ["src/content/content-script.ts"]
     }
   ],
-  "options_page": "options.html"
+  "options_page": "src/options/options.html"
 }
