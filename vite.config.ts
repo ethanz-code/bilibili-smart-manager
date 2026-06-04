@@ -10,11 +10,11 @@ export default defineConfig({
       input: {
         popup: resolve(__dirname, 'src/popup/popup.html'),
         options: resolve(__dirname, 'src/options/options.html'),
-        background: resolve(__dirname, 'src/background/service-worker.ts'),
-        contentScript: resolve(__dirname, 'src/content/content-script.ts'),
       },
       output: {
         entryFileNames: '[name].js',
+        chunkFileNames: '[name].js',
+        assetFileNames: '[name].[ext]',
       },
     },
   },

@@ -4,11 +4,15 @@
   "description": "B站智能管家 - 智能整理B站收藏夹和关注列表，支持AI分类和批量操作",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc --noEmit && vite build",
     "test": "jest",
-    "lint": "tsc --noEmit"
+    "test:watch": "jest --watch"
   },
-  "keywords": ["bilibili", "chrome-extension", "bookmark-manager"],
+  "keywords": [
+    "bilibili",
+    "chrome-extension",
+    "bookmark-manager"
+  ],
   "author": "",
   "license": "MIT",
   "type": "module",
@@ -25,6 +29,7 @@
     "@vitejs/plugin-react": "^4.2.0",
     "autoprefixer": "^10.4.0",
     "jest": "^29.7.0",
+    "jest-environment-jsdom": "^30.4.1",
     "postcss": "^8.4.0",
     "tailwindcss": "^3.4.0",
     "ts-jest": "^29.1.0",
