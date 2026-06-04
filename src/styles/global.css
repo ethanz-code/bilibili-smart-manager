@@ -1,16 +1,104 @@
 :root {
-  --primary: #00a1d6;
-  --primary-dark: #0088b9;
-  --danger: #d63031;
-  --success: #00b894;
-  --warning: #fdcb6e;
-  --bg: #f5f5f5;
-  --card-bg: #ffffff;
-  --text: #1a1a2e;
-  --text-secondary: #666666;
-  --border: #e0e0e0;
-  --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --radius: 8px;
+  /* 品牌色 - B站蓝 + 草料绿 */
+  --color-primary: #00a1d6;
+  --color-primary-hover: #0088b9;
+  --color-primary-light: #ecf5fb;
+  --color-primary-bg: rgba(0, 161, 214, 0.08);
+
+  /* 辅助色 - 交互蓝 */
+  --color-link: #166bc7;
+  --color-link-hover: #053979;
+  --color-link-light: #eff6ff;
+
+  /* 功能色 */
+  --color-success: #00a13b;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
+  --color-info: #166bc7;
+
+  /* 文字颜色 - 4级层次 */
+  --text-primary: rgba(0, 0, 0, 0.85);
+  --text-secondary: rgba(0, 0, 0, 0.65);
+  --text-tertiary: rgba(0, 0, 0, 0.45);
+  --text-quaternary: rgba(0, 0, 0, 0.25);
+
+  /* 背景色 */
+  --bg-page: #f9fafb;
+  --bg-card: #ffffff;
+  --bg-surface: #f4f5f7;
+  --bg-hover: #f7f8fa;
+  --bg-active: #eff6ff;
+
+  /* 边框色 */
+  --border-default: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(0, 0, 0, 0.15);
+  --border-focus: #166bc7;
+
+  /* 分割线 */
+  --divider: rgba(0, 0, 0, 0.06);
+
+  /* 字体 */
+  --font-family:
+    "PingFang SC",
+    "Microsoft YaHei UI",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+
+  /* 字号 */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+
+  /* 字重 */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* 行高 */
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+
+  /* 间距 - 4px网格 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* 圆角 */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 100px;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 2px 16px rgba(21, 37, 70, 0.08);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 2px 16px rgba(21, 37, 70, 0.08);
+  --shadow-dropdown: 0 4px 16px rgba(0, 0, 0, 0.12);
+
+  /* 动画 */
+  --ease-standard: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --duration-fast: 0.2s;
+  --duration-normal: 0.3s;
+  --duration-slow: 0.6s;
 }
 
 * {
@@ -20,97 +108,149 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.6;
+  font-family: var(--font-family);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
 }
 
+/* 按钮 - 草料风格 */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 16px;
+  height: 36px;
+  padding: 0 var(--space-4);
   border: none;
-  border-radius: var(--radius);
-  font-size: 14px;
-  font-weight: 500;
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--duration-normal) var(--ease-standard);
+  white-space: nowrap;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .btn-primary {
-  background: var(--primary);
+  background: var(--color-primary);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--primary-dark);
+  background: var(--color-primary-hover);
 }
 
-.btn-secondary {
-  background: var(--card-bg);
-  color: var(--text);
-  border: 1px solid var(--border);
+.btn-outline {
+  background: transparent;
+  color: var(--color-link);
+  border: 1px solid var(--color-link);
 }
 
-.btn-secondary:hover:not(:disabled) {
-  background: var(--bg);
+.btn-outline:hover:not(:disabled) {
+  background: var(--color-link-light);
 }
 
 .btn-danger {
-  background: var(--danger);
+  background: var(--color-error);
   color: white;
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: #c0392b;
+  background: #b91c1c;
 }
 
+.btn-text {
+  background: transparent;
+  color: var(--color-link);
+  border: none;
+  padding: 0 var(--space-2);
+}
+
+.btn-text:hover:not(:disabled) {
+  background: var(--bg-hover);
+}
+
+/* 输入框 - 草料风格 */
 input[type="text"],
 input[type="password"],
 input[type="number"],
 select {
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
+  height: 36px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-3);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  background: var(--bg-card);
+  transition: all var(--duration-normal) var(--ease-standard);
 }
 
 input:focus,
 select:focus {
-  border-color: var(--primary);
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px rgba(22, 107, 199, 0.1);
+  outline: none;
 }
 
+input::placeholder {
+  color: var(--text-quaternary);
+}
+
+/* 状态提示 */
 .status {
-  padding: 8px 12px;
-  background: var(--primary);
-  color: white;
-  border-radius: var(--radius);
-  font-size: 13px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 8px 0;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: white;
+  background: var(--color-primary);
+  margin: var(--space-2) 0;
 }
 
 .status.loading {
-  background: var(--warning);
-  color: var(--text);
+  background: var(--color-warning);
+  color: white;
 }
 
 .spinner {
+  display: inline-block;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* 淡入上移动画 - 草料风格 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInUp var(--duration-slow) var(--ease-standard) forwards;
 }
